@@ -10,7 +10,7 @@
 # 7. H = 4 < 7. New height not used before. Block 6
 # 8. H = 8 > 4, but same height used before. Use new block because between this and last time, our height dropped below 8. Block 7
 
-def solution(h)
+def solution(h) # Doesn't work yet! Needs fixing.
   stack = []
   blocks = 0
   before = {}
@@ -39,7 +39,7 @@ end
 h = [8, 8, 5, 7, 9, 8, 7, 4, 8]
 puts "Min num of blocks: #{solution(h)}"
 
-# def solution(h)
+# def slow_solution(h) <= works 100%, but 64% Codility performance
 #   stack = [h.shift]
 #   blocks = 1
 #   h.each do |height|

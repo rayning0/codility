@@ -40,6 +40,7 @@ puts "Min num of blocks: #{solution(h)}"
 # height: 8, stack: [4], blocks: 6
 # Answer: 7 blocks
 
+# O(n*n)
 # def slow_solution(h) #<= works 100%, but 64% Codility performance
 #   stack = [h.shift]
 #   blocks = 1

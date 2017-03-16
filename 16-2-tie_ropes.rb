@@ -1,8 +1,8 @@
 # Greedy Algorithm
 #https://codility.com/demo/results/demo93VRFP-B3X/
 
+# O(n)
 def solution(k, a)
-    # write your code in Ruby 1.9.3
     total = 0
     ropes = 0
     a.each do |rope_length|
@@ -14,5 +14,3 @@ def solution(k, a)
     end
     ropes
 end
-
-#Time complexity: O(N)

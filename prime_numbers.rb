@@ -95,9 +95,10 @@ puts "final tails: #{faster_coins(100)}"
 # so just find coins with ODD number of divisors.
 
 # Every # of form k*k has odd number of divisors.
-# There are exactly floor(sqrt(n)) such numbers between 1 and n.
-# Answer: # of PERFECT SQUARES <= n
-# Answer: sqrt(n) rounded to nearest integer ("floor" function)
+# There are exactly floor(sqrt(n)) numbers between 1 and n.
+# Answer: sqrt(n) rounded to nearest integer ("floor" function) =
+#         number of PERFECT SQUARES <= n
+# See: math.stackexchange.com/questions/370828/number-of-perfect-squares-less-than-n
 
 # O(1)
 def fastest_coins(n)

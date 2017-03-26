@@ -1,47 +1,54 @@
-def solution(a, equi = 0)
-  #puts "a: #{a}, equi: #{equi}"
-  return equi if a.size <= 1
-  stack_count = 0
-  s = new_s(a)
-  left_half = a[0..s]
-  right_half = a[s + 1..-1]
-  left = leader(left_half)
-  right = leader(right_half)
-  #puts "left_half: #{left_half}, right_half: #{right_half}"
-  #puts "left: #{left}, right: #{right}"
-  if (left && right) && (left == right)
-    stack_count += 1
-  end
-  #puts "stack_count: #{stack_count}"
-  sol1 = solution(left_half, stack_count)
-  sol2 = solution(right_half, stack_count)
-  #puts "sol1 = #{sol1}, sol2 = #{sol2}\n\n"
-  sol1 + sol2
-end
+# https://codility.com/demo/results/trainingAG7YKJ-6QQ/
+# If you have array A with leader z (leader = unique element that occurs more than in half of array), then for every separation of A into A[0..i), A[i..n), if they have the same leader, then the leader of both is z.
 
-def new_s(arr)
-  s = if arr.size.even?
-        arr.size / 2 - 1
-      else
-        arr.size / 2
-      end
-  s
-end
+# This follows from noticing that if x is a leader in A[0..i), then it occurs more than ⌈i/2⌉ elements, and similarly, if y is the leader of A[i..n), then y occurs more than ⌈(n−i)/2⌉.
 
+# If both slices have leader z, it must occur more than ⌈n/2⌉, which means that y=x as required.
 
-def slow_solution(a)
-  equi = 0
+a = [4, 3, 4, 4, 4, 2]
+
+# O(n)
+def fast_solution(a)
+  equileaders = 0
+
+  # 1. Find leader candidate
+  candidate = a.first
+  count = 1
   a.size.times do |i|
-    left = leader(a[0..i])
-    right = leader(a[i + 1..-1])
-    if (left && right) && (left == right)
-      equi += 1
+    a[i] == candidate ? count += 1 : count -= 1
+    if count == 0
+      count = 1
+      candidate = a[i]
     end
   end
-  equi
+
+  # 2. Is candidate a leader?
+  total_leaders = a.count(candidate)
+  if total_leaders <= a.size / 2
+    return 0 # no leaders in array
+  else
+    leader = candidate
+  end
+
+  # 3. Loop through all possible left/right divisions of array.
+  # From left/right leader counts, count which meet criteria of equileaders.
+  left_leader_count = 0
+  a.size.times do |i|
+    left_leader_count += 1 if a[i] == leader
+    right_leader_count = total_leaders - left_leader_count
+
+    # i + 1 = length of left side
+    # a.size - 1 - i = length of right side
+    # (i + 1) + (a.size - 1 - i) = a.size
+    if left_leader_count > (i + 1) / 2 &&
+       right_leader_count > (a.size - 1 - i) / 2
+      equileaders += 1
+    end
+  end
+  equileaders
 end
 
-
+#_________________________
 def leader(arr)
   leader = nil
   stack = []
@@ -60,73 +67,14 @@ def leader(arr)
   return leader if leader
 end
 
-______________
-Output of failed solution at top (got 11% Codility score):
-
-Example test:    [4, 3, 4, 4, 4, 2]
-Output:
-a: [4, 3, 4, 4, 4, 2], equi: 0
-left_half: [4, 3, 4], right_half: [4, 4, 2]
-left: 4, right: 4
-
-a: [4, 3, 4], equi: 1
-left_half: [4, 3], right_half: [4]
-left: , right: 4
-
-a: [4, 3], equi: 1
-left_half: [4], right_half: [3]
-left: 4, right: 3
-
-a: [4], equi: 1
-a: [3], equi: 1
-a: [4], equi: 1
-a: [4, 4, 2], equi: 1
-left_half: [4, 4], right_half: [2]
-left: 4, right: 2
-
-a: [4, 4], equi: 1
-left_half: [4], right_half: [4]
-left: 4, right: 4
-
-a: [4], equi: 2
-a: [4], equi: 2
-a: [2], equi: 1
-WRONG ANSWER  (got 8 expected 2)
-__________________
-Example test:    [4, 3, 4, 4, 4, 2]
-Output:
-a: [4, 3, 4, 4, 4, 2], equi: 0
-left_half: [4, 3, 4], right_half: [4, 4, 2]
-left: 4, right: 4
-stack_count: 1
-a: [4, 3, 4], equi: 1
-left_half: [4, 3], right_half: [4]
-left: , right: 4
-stack_count: 0
-a: [4, 3], equi: 0
-left_half: [4], right_half: [3]
-left: 4, right: 3
-stack_count: 0
-a: [4], equi: 0
-a: [3], equi: 0
-sol1 = 0, sol2 = 0
-
-a: [4], equi: 0
-sol1 = 0, sol2 = 0
-
-a: [4, 4, 2], equi: 1
-left_half: [4, 4], right_half: [2]
-left: 4, right: 2
-stack_count: 0
-a: [4, 4], equi: 0
-left_half: [4], right_half: [4]
-left: 4, right: 4
-stack_count: 1
-a: [4], equi: 1
-a: [4], equi: 1
-sol1 = 1, sol2 = 1
-
-a: [2], equi: 0
-sol1 = 2, sol2 = 0
-
-sol1 = 0, sol2 = 2
+def slow_solution(a)
+  equi = 0
+  a.size.times do |i|
+    left = leader(a[0..i])
+    right = leader(a[i + 1..-1])
+    if (left && right) && (left == right)
+      equi += 1
+    end
+  end
+  equi
+end

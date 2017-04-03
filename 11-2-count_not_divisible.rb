@@ -33,18 +33,16 @@ def fast_solution(a)
   nondivisors = []
   amax = a.max
   freq = Hash.new(0)
+  divisors = {}
 
   # Frequency hash of each num
+  # Initialize hash of divisors of each num
   a.each do |num|
     freq[num] += 1
+    divisors[num] = num == 1 ? [1] : [1, num]
   end
 # freq: {3=>2, 1=>1, 2=>1, 6=>1, 12=>1}
-
-  divisors = {}
-  a.each do |num|
-    divisors[num] = num == 1? [1] : [1, num]
-  end
-  # {3=>[1, 3], 1=>[1], 2=>[1, 2], 6=>[1, 6], 12=>[1, 12]}
+# divisors: {3=>[1, 3], 1=>[1], 2=>[1, 2], 6=>[1, 6], 12=>[1, 12]}
 
   # Sieve of Eratosthenes: Hash of divisors of each num
   div = 2
@@ -71,7 +69,7 @@ def fast_solution(a)
   nondivisors
 end
 
-fast_solution([3, 1, 2, 3, 6, 12])
+p fast_solution([3, 1, 2, 3, 6, 12])
 # nondivisors: [3, 5, 4, 3, 1, 0]
 # _________________________________
 # freq: {3=>2, 1=>1, 2=>1, 6=>1, 12=>1}

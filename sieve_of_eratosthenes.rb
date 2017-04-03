@@ -74,6 +74,5 @@ end
 
 # can't run! Used over 20 GB RAM!
 #p prime_factors_bad(600851475143)
-
 p prime_factors(600851475143) # <- num from Project Euler
 # [71, 839, 1471, 6857]

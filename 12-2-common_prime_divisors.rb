@@ -56,4 +56,4 @@ def fast_solution(a, b)
   count
 end
 
-p solution([15, 10, 3], [75, 30, 5])
+p fast_solution([15, 10, 3], [75, 30, 5])

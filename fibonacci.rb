@@ -87,22 +87,47 @@ end
 
 # For all given numbers x0, x1,...,xn-1, such that 1 <= xi <= m <= 1,000,000,
 # check if they may be presented as sum of two Fibonacci numbers.
-# fib(30) = 832040, fib(31) = 1346269
-require 'pry'
+# fib(30) = 832040, fib(31) = 1346269 (> 1,000,000)
+
+# O(n + m)
 def check_sum_fib(a)
   f = [0, 1]
   n = 2
   m = a.max
-  puts "a: #{a}"
-  puts "f: #{f}, m: #{m}"
-  # O(m)
+  puts "a: #{a}, m: #{m}"
   loop do
     fib = fib(n)
     break if fib > m
     f[n] = fib
-    n += 1
+    n += 1  # max value = 30
   end
-  
+  puts "Fib nums: #{f}"
+  fib_sum = []
+
+  (0..f.size - 2).each do |i|
+    (i + 1..f.size - 1).each do |j|
+      k = f[i] + f[j]
+# If some of the Fibonacci #'s sum to k <= m, we mark index k in array to 
+# denote that k can be presented as sum of two Fibonacci numbers.
+      fib_sum[k] = [f[i], f[j]] if k <= m
+    end
+  end
+
+# for each number xi we can answer whether it is the sum of two Fibonacci
+# numbers in constant time. The total time complexity is O(n + m).
+  a.each do |num|
+    if fib_sum[num]
+      puts "#{num} is sum of #{fib_sum[num]}."
+    end
+  end
 end
 
-p check_sum_fib([101, 503, 2027, 6368, 12325, 37323, 923426, 124567, 734774, 523621])
+check_sum_fib([29, 178, 2584, 6368, 12325, 37323, 242786, 346468, 734774, 635622])
+
+# Fib nums: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229]
+# 29 is sum of [8, 21].
+# 178 is sum of [34, 144].
+# 2584 is sum of [987, 1597].
+# 242786 is sum of [46368, 196418].
+# 346468 is sum of [28657, 317811].
+# 635622 is sum of [121393, 514229].

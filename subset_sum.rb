@@ -6,7 +6,7 @@
  # http://www.skorks.com/2011/02/algorithms-a-dropbox-challenge-and-dynamic-programming/
  # https://www.youtube.com/watch?v=zKwwjAkaXLI
 
-# a = [4, 6, 10, 1, 3]
+a = [4, 6, 10, 1, 3]
 require 'pry'
 require 'rspec/autorun'
 
@@ -14,7 +14,7 @@ require 'rspec/autorun'
 def subset_sum1(a, sum, result = [])
   #puts "a: #{a}, sum: #{sum}, result: #{result}"
   return result if sum == 0 # found answer
-  if sum < 0 || (a.size == 0 && sum != 0)
+  if sum < 0 || a.size == 0
     result.pop
     return false
   end
@@ -102,13 +102,11 @@ end
 # a: [], sum: 22, result: []
 # false
 
-
-
 # Recursive: Works for positive AND negative numbers
 def subset_sum2(a, sum, result = [])
-  puts "a: #{a}, sum: #{sum}, result: #{result}"
+  # puts "a: #{a}, sum: #{sum}, result: #{result}"
   return result if sum == 0 # got answer
-  if a.size == 0 && sum != 0
+  if a.size == 0
     result.pop
     return false
   end
@@ -240,10 +238,10 @@ end
 # false
 
 # Dynamic Programming, assuming all POSITIVE numbers
-def subset_sum_dp(a, sum)
+def subset_sum_dp1(a, sum)
   result = []
   max_sum = a.sum
-  return [] if sum > max_sum || sum == 0
+  return [] if a.size == 0 || !sum.between?(0, max_sum) || sum == 0
   width = [a.max, sum].max + 1
 
   m = Array.new(a.size) { Array.new(width, 0) }
@@ -299,7 +297,6 @@ def subset_sum_dp(a, sum)
         if r == 0 && col > 0 && m[r][col] == 1
           result << a[0]
           row = r
-          break
         end
       end
 
@@ -311,6 +308,15 @@ def subset_sum_dp(a, sum)
   p result
   result
 end
+
+# a: [4, 6, 10, 1, 3]. max_sum: 24. Can we sum to 22?
+# [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+# [[1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+#  [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+#  [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0],
+#  [1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0],
+#  [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0]]
+# No
 
 # a: [4, 6, 10, 1, 3]. max_sum: 24. Can we sum to 23?
 # [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
@@ -330,7 +336,146 @@ end
 #  [1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1]]
 # [3, 1, 10, 6, 4]
 
+# Dynamic Programming, for positive AND negative numbers
+def subset_sum_dp2(a, sum)
+  if a.size == 1
+    return sum == a.first ? a : []
+  end
 
+  min_sum, max_sum = 0, 0
+  a.each do |num|
+    if num > 0
+      max_sum += num
+    else
+      min_sum += num
+    end
+  end
+
+  return [] if a.size == 0 || !sum.between?(min_sum, max_sum) || sum == 0
+
+  # map min_sum => 0, max_sum => max_sum - min_sum
+  # sum => sum - min_sum
+
+  result = []
+
+  width = max_sum - min_sum + 1
+  min_num = a[1..-1].min
+  if a.size > 1 && min_num < 0
+    width -= min_num  # expands width of 2D matrix for negative numbers
+  end
+
+  m = Array.new(a.size) { Array.new(width, 0) }
+
+  if 0.between?(min_sum, max_sum)
+    a.size.times do |row|
+      # Fill 0 col, since we get 0 sum for all numbers by excluding them all
+      m[row][-min_sum] = 1
+    end
+  end
+
+  m[0][a[0] - min_sum] = 1 # Fill row 1. Put 1 (True) at index of first element.
+
+  (1..a.size - 1).each do |row|
+    (0..max_sum - min_sum).each do |col|
+
+      # use | (bit operator OR) to compare 0 and 1
+      m_up = if col - a[row] >= 0
+               m[row - 1][col - a[row]]
+             else
+               0
+             end
+      m[row][col] = m[row - 1][col] | m_up
+    end
+  end
+  puts "a: #{a}. max_sum: #{max_sum}. Can we sum to #{sum}?"
+  if sum == -12
+    p (0..width - 1).to_a # print col numbers
+    p (min_sum..max_sum).to_a # actual col numbers
+    #pp m                # print final matrix
+  end
+
+  row = a.size - 1
+  col = sum - min_sum
+
+  if m[row][col] == 0  # did not find subset sum
+    puts 'No'
+    return []
+  end
+
+  # Build sum result array from final matrix
+  while row >= 0 && col >= 0
+    if m[row][col] == 1
+      if row == 0 && col != -min_sum
+        result << a[0]
+        break
+      end
+
+      (row - 1).downto(0).each do |r|
+        if m[r][col] == 0
+          result << a[r + 1]
+          row = r
+          break
+        end
+
+        if r == 0 && col != -min_sum && m[r][col] == 1
+          result << a[0]
+          row = r
+        end
+      end
+
+      col -= a[row + 1]
+    else
+      break
+    end
+  end
+  p result
+  result
+end
+
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -12?
+# [-3, -9]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -11?
+# [-3, 1, -9]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -9?
+# [-9]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -8?
+# [1, -9]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -7?
+# [-3, 1, -9, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -6?
+# [-3, -9, 6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -5?
+# [-9, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -4?
+# [1, -9, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -3?
+# [-9, 6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -2?
+# [1, -9, 6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to -1?
+# [-3, 1, -9, 6, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 1?
+# [-9, 6, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 2?
+# [1, -9, 6, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 3?
+# [-3, 6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 4?
+# [4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 5?
+# [1, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 6?
+# [6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 7?
+# [1, 6]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 8?
+# [-3, 1, 6, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 10?
+# [6, 4]
+# a: [4, 6, -9, 1, -3]. max_sum: 11. Can we sum to 11?
+# [1, 6, 4]
+
+# ALL TESTS PASS!
 describe 'Subset Sum' do
   let(:a) { [4, 6, 10, 1, 3] }
   let(:b) { [4, 6, -9, 1, -3] }
@@ -341,7 +486,7 @@ describe 'Subset Sum' do
     describe 'finds no subset sum answers' do
       it 'if array all positive' do
         no_subset_a.each do |sum|
-          expect(subset_sum_dp(a, sum)).to eq []
+          expect(subset_sum_dp1(a, sum)).to eq []
           expect(subset_sum1(a, sum)).to eq([]).or eq false
           expect(subset_sum2(a, sum)).to eq([]).or eq false
         end
@@ -350,6 +495,7 @@ describe 'Subset Sum' do
       it 'if array includes negatives' do
         no_subset_b.each do |sum|
           expect(subset_sum2(b, sum)).to eq([]).or eq false
+          expect(subset_sum_dp2(b, sum)).to eq([]).or eq false
         end
       end
     end
@@ -358,7 +504,7 @@ describe 'Subset Sum' do
       it 'if array all positive' do
         (a.sum + 1).times do |s|
           unless no_subset_a.include?(s)
-            expect(subset_sum_dp(a, s).sum).to eq s
+            expect(subset_sum_dp1(a, s).sum).to eq s
             expect(subset_sum1(a, s).sum).to eq s
             expect(subset_sum2(a, s).sum).to eq s
           end
@@ -369,8 +515,7 @@ describe 'Subset Sum' do
         (-12..11).each do |s|
           unless no_subset_b.include?(s)
             expect(subset_sum2(b, s).sum).to eq s
-            #expect(subset_sum_dp(a, s).sum).to eq s
-            puts "***"
+            expect(subset_sum_dp2(b, s).sum).to eq s
           end
         end
       end

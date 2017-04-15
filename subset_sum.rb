@@ -7,7 +7,6 @@
  # https://www.youtube.com/watch?v=zKwwjAkaXLI
 
 a = [4, 6, 10, 1, 3]
-require 'pry'
 require 'rspec/autorun'
 
 # Recursive: Works for ALL POSITIVE numbers:

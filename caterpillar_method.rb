@@ -54,5 +54,6 @@ def triangles(a)
   triangles
 end
 
+a = [10, 2, 5, 1, 8, 12]
 p a.sort
-p "#{triangles(a.sort)} triangles"
+p "#{triangles(a)} triangles"

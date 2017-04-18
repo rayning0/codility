@@ -1,12 +1,13 @@
 
 # https://codility.com/demo/results/trainingP4UTRR-JAT/
+# Fastest: solution4, Caterpillar method!
 
 # Array is sorted in increasing order. Find number of 
 # distinct absolute values in array
-
+a = [-5, -4, -4, -2, 0, 1, 1, 1, 4, 5, 6]
 #1. Use Array methods
 # O(n) or O(n log n)
-def solution(a)
+def solution1(a)
   a.map(&:abs).uniq.size
 end
 
@@ -14,13 +15,13 @@ end
 # O(n) or O(n log n)
 require 'set'
 
-def solution(a)
+def solution2(a)
   Set.new(a.map(&:abs)).size
 end
 
 #3. Use Hash
 # O(n) or O(n log n)
-def solution(a)
+def solution3(a)
   freq = {}
   a.each do |num|
     num = num.abs
@@ -43,17 +44,17 @@ end
 
 # In all cases, if next step is same character as last one, keep moving cursor.
 
-a = [-5, -4, -4, -2, 0, 1, 1, 1, 4, 5, 6]
+#a = [-5, -4, -4, -2, 0, 1, 1, 1, 4, 5, 6]
 # O(N) or O(N*log(N))
-def solution(a)
+def solution4(a)
   left = 0
   right = a.size - 1
   distinct = 0
 
   while left <= right
-    puts "left: #{left}, right: #{right}"
-    puts "a[l]: #{a[left]}, a[r]: #{a[right]}"
-    puts "distinct: #{distinct}"
+    # puts "left: #{left}, right: #{right}"
+    # puts "a[l]: #{a[left]}, a[r]: #{a[right]}"
+    # puts "distinct: #{distinct}"
     if a[left].abs > a[right].abs
       begin
         left += 1
@@ -70,13 +71,11 @@ def solution(a)
         right -= 1
       end until a[right] != a[right + 1] 
     end
-    distinct += 1
 
+    distinct += 1
   end
   distinct
 end
-
-p solution(a)
 
 # left: 0, right: 10
 # a[l]: -5, a[r]: 6
@@ -97,3 +96,22 @@ p solution(a)
 # a[l]: 0, a[r]: 0
 # distinct: 5
 # 6
+
+start = Time.now
+p solution1(a)
+puts "#{Time.now - start} secs"
+start = Time.now
+p solution2(a)
+puts "#{Time.now - start} secs"
+start = Time.now
+p solution3(a)
+puts "#{Time.now - start} secs"
+start = Time.now
+p solution4(a)
+puts "#{Time.now - start} secs"
+
+# Fastest: solution4, Caterpillar method!
+# 1) 4.8e-05 secs
+# 2) 3.4e-05 secs
+# 3) 1.6e-05 secs
+# 4) 1.5e-05 secs

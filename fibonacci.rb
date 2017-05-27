@@ -57,7 +57,7 @@ end
 # 13
 
 # iterative (bottom up)
-# O(n)
+# O(n) time, O(n) space
 def fib(n)
   return n if n <= 1
   f = [0, 1]
@@ -65,6 +65,19 @@ def fib(n)
     f[i] = f[i - 2] + f[i - 1]
   end
   f[n]
+end
+
+# iterative
+# O(n) time, O(1) space
+def fib(n)
+  return n if n <= 1
+  f0, f1, f2 = 0, 1, 1
+  (2..n).each do |i|
+    f2 = f0 + f1
+    f0 = f1
+    f1 = f2
+  end
+  f2
 end
 
 #p fib(10) # answer 55

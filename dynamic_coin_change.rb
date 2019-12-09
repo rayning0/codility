@@ -98,59 +98,127 @@ coins = [1, 2, 5, 10, 20, 50, 100, 200]
 amount = 200
 # 73682 ways
 
-MAXINT = (2**(0.size * 8 -2) -1)
+# ---------------------- Codility --------------------------------------
+# https://codility.com/media/train/15-DynamicProgramming.pdf
+# Time and space complexity: O(n*k)
+require 'pp'
+
+# MAXINT = (2**(0.size * 8 -2) -1)
+MAXINT = 100 # Or pick any number, like 100, bigger than all numbers below row 0
+
 def dynamic_coin_changing(coins, amount)
+  puts "Coins: #{coins}. Amount wanted: #{amount}"
   solution = Array.new(coins.size + 1) { Array.new(amount + 1, 0) }
+
+  # if no coins and the amount > 0, there's no solution, so solution[0, j] = MAXINT or infinity
   solution[0] = [0] + [MAXINT] * amount
+
   (1..coins.size).each do |row|
     coin = coins[row - 1]
-# if the amount to be paid is smaller than the highest denomination
+
+# if the amount to be paid is smaller than highest denomination
 # "coin at current row," ignore this coin and copy solution from previous row:
-# (for all row > 0 and col such that "coin at current row" > col);
+# (for row > 0 and col < "coin at current row")
     (0..coin - 1).each do |col|
       solution[row][col] = solution[row - 1][col]
     end
 
-# choose option w/ fewer coins:
-# 1. Use highest value coin, and a smaller amount to be paid remains, OR
+    # Ex: For coin value 4, loop from cols 0-3.
+    puts "\nRow: #{row}. Coin: #{coin}. Loop of cols from 0 to #{coin - 1}:"
+    pp solution
+
+# Choose option w/ fewer coins. Either:
+# 1. Use highest value coin and a smaller amount to be paid remains:
 #   solution[row][col - coin] + 1
 # 2. Don’t use highest value coin and keep answer from previous row
 #   solution[row - 1][col]
-# (for all row > 0 and all col such that "coin at current row" <= col).
+# (for row > 0 and col >= "coin at current row").
     (coin..amount).each do |col|
       solution[row][col] = [solution[row][col - coin] + 1, solution[row - 1][col]].min
     end
-  end
-  solution[coins.size][amount]
-end
 
-# [[0, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY],
-#  [0, 1, 2, 3, 4, 5, 6],
-#  [0, 1, 2, 1, 2, 3, 2],
-#  [0, 1, 2, 1, 1, 2, 2]]
-#
-#  Ans: 2
+    # Ex: For coin value 4, loop from cols 4-6
+    puts "loop of cols from Coin: #{coin} to Amount: #{amount}:"
+    pp solution
+  end
+
+  puts
+  "Min # of coins that sum to amount #{amount}: #{solution[coins.size][amount]}"
+end
 
 coins = [1, 3, 4]
 amount = 6
-p dynamic_coin_changing(coins, amount)
+puts dynamic_coin_changing(coins, amount)
 
-# To calculate "solution,"" we only use previous row. We don’t need to remember all rows.
+# Coins: [1, 3, 4]. Amount wanted: 6
+
+# Row: 1. Coin: 1. Loop of cols from 0 to 0:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 0, 0, 0, 0, 0, 0],
+#  [0, 0, 0, 0, 0, 0, 0],
+#  [0, 0, 0, 0, 0, 0, 0]]
+# loop of cols from Coin: 1 to Amount: 6:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 1, 2, 3, 4, 5, 6],
+#  [0, 0, 0, 0, 0, 0, 0],
+#  [0, 0, 0, 0, 0, 0, 0]]
+
+# Row: 2. Coin: 3. Loop of cols from 0 to 2:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 1, 2, 3, 4, 5, 6],
+#  [0, 1, 2, 0, 0, 0, 0],
+#  [0, 0, 0, 0, 0, 0, 0]]
+# loop of cols from Coin: 3 to Amount: 6:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 1, 2, 3, 4, 5, 6],
+#  [0, 1, 2, 1, 2, 3, 2],
+#  [0, 0, 0, 0, 0, 0, 0]]
+
+# Row: 3. Coin: 4. Loop of cols from 0 to 3:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 1, 2, 3, 4, 5, 6],
+#  [0, 1, 2, 1, 2, 3, 2],
+#  [0, 1, 2, 1, 0, 0, 0]]
+# loop of cols from Coin: 4 to Amount: 6:
+# [[0, 100, 100, 100, 100, 100, 100],
+#  [0, 1, 2, 3, 4, 5, 6],
+#  [0, 1, 2, 1, 2, 3, 2],
+#  [0, 1, 2, 1, 1, 2, 2]]
+
+# "Min # of coins that sum to amount 6: 2"
+
+puts
+# More efficient solution. We only use previous row to find new row.
+# We don’t need to remember all rows.
+# Time complexity: O(n*k). Space complexity: O(k).
 def dynamic_coin_changing_optimized(coins, amount)
   solution = [0] + [MAXINT] * amount
   (1..coins.size).each do |row|
     coin = coins[row - 1]
+
     (coin..amount).each do |col|
       solution[col] = [solution[col - coin] + 1, solution[col]].min
     end
+
+    puts "loop of cols from Coin: #{coin} to Amount: #{amount}:"
+    p solution
   end
-  solution[amount]
+
+  puts
+  "Min # of coins that sum to amount #{amount}: #{solution[amount]}"
 end
-p dynamic_coin_changing_optimized(coins, amount)
+puts dynamic_coin_changing_optimized(coins, amount)
 
-# [0, 1, 2, 1, 1, 2, 2]
-# Ans: 2
+# loop of cols from Coin: 1 to Amount: 6:
+# [0, 1, 2, 3, 4, 5, 6] <- matches line 162
+# loop of cols from Coin: 3 to Amount: 6:
+# [0, 1, 2, 1, 2, 3, 2] <- matches line 174
+# loop of cols from Coin: 4 to Amount: 6:
+# [0, 1, 2, 1, 1, 2, 2] <- matches line 186
 
+# Min # of coins that sum to amount 6: 2
+
+#----------
 # A small frog wants to get from position 0 to k (1 <= k <= 10000).
 # The frog can jump over any one of n fixed distances s0,s1,...,sn−1 (1 <= si <= k).
 # The goal is to count the number of different ways in which the frog can jump to position k.
@@ -159,7 +227,8 @@ p dynamic_coin_changing_optimized(coins, amount)
 # There is exactly one way for the frog to jump to position 0, so dp[0] = 1
 #
 # The number of ways in which the frog can jump to position j with a final jump of si is dp[j − si].
-# Thus, the number of ways in which the frog can get to position j is increased by the number of ways of getting to position j − si, for every jump si.
+# Thus, the number of ways in which the frog can get to position j is increased
+# by the number of ways of getting to position j − si, for every jump si.
 def frog(s, k, q)
   dp = [1] + [0] * k
   (1..k).each do |j|

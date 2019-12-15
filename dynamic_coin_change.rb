@@ -238,4 +238,10 @@ def frog(s, k, q)
       end
     end
   end
+
+  dp
 end
+
+p frog([2,3,4], 10, 10)
+# output: [1, 0, 1, 1, 2, 2, 4, 5, 8, 1, 7]
+# But I don't know what it means.

@@ -1,30 +1,29 @@
-# https://codility.com/demo/results/trainingSHP35R-NYT/
+# https://app.codility.com/demo/results/trainingJW3BU4-E8H/
 
 def solution(s)
-  right_brackets = ['}', ']', ')']
-  return 0 if right_brackets.include?(s[0])
-  brackets = {'{' => '}', '[' => ']', '(' => ')'}
   stack = []
-  s.split('').each do |char|
-    puts "char = #{char}"
-    if brackets[stack.last] == char
-      puts "pop #{stack.last} #{char}"
+  hash = {'{' => '}', '(' => ')', '[' => ']'}
+  s.each_char do |char|
+    if hash[stack.last] == char
       stack.pop
     else
       stack << char
     end
-    puts "stack: #{stack}"
   end
-  puts "final stack: #{stack}"
-  if stack.size > 0
-    0
-  else
-    1
-  end
+
+  return 0 if stack.size > 0
+  1
 end
 
-p solution("{[()()]}")
-p solution("([)()]")
+describe '#brackets' do
+  it 'returns 1 if brackets are properly nested' do
+    expect(solution("{[()()]}")).to eq 1
+  end
+
+  it 'returns 0 if they are not' do
+    expect(solution("([)()]")).to eq 0
+  end
+end
 
 # char = {
 # stack: ["{"]
